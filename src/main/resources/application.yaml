@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    hikari:
+      driver-class-name: org.h2.Driver
+      jdbc-url: jdbc:h2:file:./db;AUTO_SERVER=TRUE;Mode=MYSQL
+      username: sa
+      password:
+      pool-name: hikari-cp
+      minimum-idle: 10
+      maximum-pool-size: 30
+      connection-test-query: SELECT 1
+
+  jpa:
+    hibernate.ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate.default_batch_fetch_size: 1000
+      javax.persistence.sharedCache.mode: ENABLE_SELECTIVE
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: varchar
+
+logging:
+  level:
+    net.jogeum: DEBUG

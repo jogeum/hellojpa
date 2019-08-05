@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.jogeum.hellojpa.repository.PostViewMapper">
+
+    <sql id="select">
+        select
+            a.id,
+            b.name as category_name,
+            a.title,
+            a.content,
+            c.description,
+            d.tag,
+            a.created_by,
+            a.created_date
+    </sql>
+
+    <sql id="from">
+        from
+            post a
+            inner join
+                category b
+                on a.category_id = b.id
+            left join
+                post_detail c
+                on a.id = c.post_id
+            left join
+                (
+                    select
+                        e.post_id,
+                        group_concat(e.tag_name) as tag
+                    from
+                        post_tag e
+                    group by
+                        e.post_id
+                ) d
+                on a.id = d.post_id
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="type != null">
+                <if test="type.name() == 'title'">
+                    and a.title like concat('%', #{value}, '%')
+                </if>
+                <if test="type.name() == 'category'">
+                    and b.name = #{value}
+                </if>
+                <if test="type.name() == 'date'">
+                    and to_char(a.created_date, 'yyyymmdd') &gt;= #{value}
+                </if>
+                <if test="type.name() == 'tag'">
+                    and d.tag like concat('%', #{value}, '%')
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <sql id="order">
+        order by
+            a.created_date DESC
+    </sql>
+
+    <select id="getList" parameterType="map" resultType="net.jogeum.hellojpa.domain.PostView">
+        <include refid="select"/>
+        <include refid="from"/>
+        <include refid="where"/>
+        <include refid="order"/>
+    </select>
+
+    <select id="getCount" parameterType="map" resultType="int">
+        select count(*)
+        <include refid="from"/>
+        <include refid="where"/>
+    </select>
+
+</mapper>
